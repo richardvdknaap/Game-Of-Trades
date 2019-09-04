@@ -24,9 +24,8 @@ public class ProjectSanityTest {
         String base = "io.gameoftrades.student44.HandelaarImpl";
         try {
             Class.forName(base);
-            fail(base + " is not niet hernoemd.");
         } catch (ClassNotFoundException ex) {
-            // Good!
+            fail(base + " is not niet hernoemd.");
         }
     }
 
