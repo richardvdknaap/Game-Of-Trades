@@ -59,7 +59,6 @@ public class WereldLaderImplTest {
     @Test
     public void zouLegeKaartMoetenLaden() {
         Wereld w = lader.laad("/kaarten/testcases/lege-kaart.txt");
-
         assertEquals(0, w.getKaart().getBreedte());
         assertEquals(0, w.getKaart().getHoogte());
         assertTrue(w.getSteden().isEmpty());
