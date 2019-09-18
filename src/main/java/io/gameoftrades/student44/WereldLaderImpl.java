@@ -28,8 +28,7 @@ public class WereldLaderImpl implements WereldLader {
 
 
         //FIRST PART
-        String line = s.nextLine();
-        line.trim();
+        String line = s.nextLine().trim();
         String[] data = line.split(",");
         int[] intData = new int[data.length];
 
@@ -53,8 +52,7 @@ public class WereldLaderImpl implements WereldLader {
 
         //THIRD PART
         ArrayList<Stad> a = new ArrayList<>();
-        line  = s.nextLine();
-        int cityAmount = line.charAt(1);
+        int cityAmount = Integer.parseInt(line);
         line = s.nextLine();
 
         for (int x = 0; x < cityAmount; x++) {
@@ -62,59 +60,48 @@ public class WereldLaderImpl implements WereldLader {
             String[] citydata = line.split(",");
             int[] cityint = new int[citydata.length];
 
-            for (int i = 0; i < cityint.length; i++) {
+            int xas = Integer.parseInt(citydata[0]);
+            int yas = Integer.parseInt(citydata[1]);
+            Coordinaat coordinaat = Coordinaat.op(xas, yas);
+            String naam = citydata[2];
+            Stad stad = Stad.op(coordinaat, naam);
+            a.add(stad);
 
-                intData[i] = Integer.parseInt(citydata[i]);
-                int xas = Integer.parseInt(citydata[0]);
-                int yas = Integer.parseInt(citydata[1]);
-                Coordinaat coordinaat = Coordinaat.op(xas, yas);
-                String naam = citydata[2];
-                Stad stad = Stad.op(coordinaat, naam);
-                a.add(stad);
 
-            }
             line = s.nextLine();
 
         }
 
         //FOURTH PART
-        int handelAmount = s.nextInt();
+        int handelAmount = Integer.parseInt(line);
+        System.out.println(handelAmount);
         line = s.nextLine();
         ArrayList<Handel> handels = new ArrayList<>();
         for (int x = 0; x < handelAmount; x++){
             for (Stad stad : a) {
                 line.trim();
                 String[] marktData = line.split(",");
-                int[] marktint = new int[marktData.length];
-
-                for (int i = 0; i < marktint.length; i++) {
-
-                    if(marktData[0].equals(stad.getNaam())){
-                        if(marktData[1].equals("BIEDT")){
-                            HandelType handelType = HandelType.BIEDT;
-                            Handelswaar handelswaar = new Handelswaar(marktData[2]);
-                            int prijs = Integer.parseInt(marktData[3]);
-                            Handel h = new Handel(stad,handelType,handelswaar,prijs);
-                            handels.add(h);
-                        }
-                        else{
-                            HandelType handelType = HandelType.VRAAGT;
-                            Handelswaar handelswaar = new Handelswaar(marktData[2]);
-                            int prijs = Integer.parseInt(marktData[3]);
-                            Handel h = new Handel(stad,handelType,handelswaar,prijs);
-                            handels.add(h);
-                        }
+                if(marktData[0].equals(stad.getNaam())){
+                    if(marktData[1].equals("BIEDT")){
+                        HandelType handelType = HandelType.BIEDT;
+                        Handelswaar handelswaar = new Handelswaar(marktData[2]);
+                        int prijs = Integer.parseInt(marktData[3]);
+                        Handel h = new Handel(stad,handelType,handelswaar,prijs);
+                        handels.add(h);
                     }
-
+                    else{
+                        HandelType handelType = HandelType.VRAAGT;
+                        Handelswaar handelswaar = new Handelswaar(marktData[2]);
+                        int prijs = Integer.parseInt(marktData[3]);
+                        Handel h = new Handel(stad,handelType,handelswaar,prijs);
+                        handels.add(h);
+                    }
                 }
             }
         }
         Markt m = new Markt(handels);
 
-
-        Wereld.van(k,a,m);
-
-        return null;
+        return  Wereld.van(k,a,m);
     }
 
 
