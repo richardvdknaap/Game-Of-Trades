@@ -77,30 +77,37 @@ public class WereldLaderImpl implements WereldLader {
         int handelAmount = Integer.parseInt(line.trim());
         if(s.hasNextLine()) {
             line = s.nextLine();
+
         }
-        ArrayList<Handel> handels = new ArrayList<>();
-        for (int x = 0; x < handelAmount; x++){
-            for (Stad stad : a) {
-                line.trim();
-                String[] marktData = line.split(",");
+            ArrayList<Handel> handels = new ArrayList<>();
+            for (int x = 0; x < handelAmount; x++){
+                for (Stad stad : a) {
+                    line.trim();
+                    String[] marktData = line.split(",");
 
-                /*System.out.println(a);
-                System.out.println(marktData[0]);
-                System.out.println(!a.contains(marktData));
-                if(a.stream(marktData).anyMatch("s"::equals)){
-                    throw new IllegalArgumentException();
-                }*/
+                    /*System.out.println(a);
+                    System.out.println(marktData[0]);
+                    System.out.println(!a.contains(marktData));
+                    if(a.stream(marktData).anyMatch("s"::equals)){
+                        throw new IllegalArgumentException();
+                    }*/
+
+                    if(marktData[0].equals(stad.getNaam())){
+                        HandelType handelType = HandelType.valueOf(marktData[1]);
+                        Handelswaar handelswaar = new Handelswaar(marktData[2]);
+                        int prijs = Integer.parseInt(marktData[3].trim());
+                        Handel h = new Handel(stad,handelType,handelswaar,prijs);
+                        handels.add(h);
+                    }
 
 
-                if(marktData[0].equals(stad.getNaam())){
-                    HandelType handelType = HandelType.valueOf(marktData[1]);
-                    Handelswaar handelswaar = new Handelswaar(marktData[2]);
-                    int prijs = Integer.parseInt(marktData[3].trim());
-                    Handel h = new Handel(stad,handelType,handelswaar,prijs);
-                    handels.add(h);
                 }
+
+                if(s.hasNextLine()){
+                    line = s.nextLine();
+                }
+
             }
-        }
         Markt m = new Markt(handels);
 
         return  Wereld.van(k,a,m);
