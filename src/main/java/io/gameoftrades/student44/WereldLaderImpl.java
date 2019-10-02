@@ -79,10 +79,10 @@ public class WereldLaderImpl implements WereldLader {
             lijn = scan.nextLine();
         }
         ArrayList<Handel> handels = new ArrayList<>();
-        for (int x = 0; x < handelAmount; x++){
-            for (Stad stad : a) {
-                line.trim();
-                String[] marktData = line.split(",");
+        for (int x = 0; x < handelHoeveelheid; x++){
+            for (Stad stad : steden) {
+                lijn.trim();
+                String[] marktData = lijn.split(",");
                 
                 if(marktData[0].equals(stad.getNaam())){
                     HandelType handelType = HandelType.valueOf(marktData[1]);
