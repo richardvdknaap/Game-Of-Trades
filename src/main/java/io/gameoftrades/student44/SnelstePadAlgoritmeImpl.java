@@ -6,93 +6,94 @@ import io.gameoftrades.model.kaart.Kaart;
 import io.gameoftrades.model.kaart.Pad;
 import io.gameoftrades.model.kaart.Richting;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
 
-    double fCost;
-    double hCost;
-    double gCost;
-    Coordinaat startNode;
-    Coordinaat targetNode;
-    Coordinaat current;
+    Node startNode;
+    Node targetNode;
 
 
     @Override
     public Pad bereken(Kaart kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
 
-        this.startNode = coordinaat;
-        this.targetNode = coordinaat1;
-        //this.current = coordinaat;
+        this.startNode = new Node(true,coordinaat.getX(),coordinaat.getY());
+        this.targetNode = new Node(true,coordinaat1.getX(),coordinaat1.getY());
 
-        List<Coordinaat> openSet = new ArrayList<>();
-        HashSet<Coordinaat> closedSet = new HashSet<>();
-
+        ArrayList<Node> openSet = new ArrayList<>();
+        HashSet<Node> closedSet = new HashSet<>();
         openSet.add(startNode);
 
-        while (!openSet.isEmpty()) {
-
-            Coordinaat node = openSet.get(0);
+        while (openSet.size()>0) {
+            Node node = openSet.get(0);
             for (int i = 1; i < openSet.size(); i++) {
-
-                if (openSet.get(i).fCost)
-
-            }
-            if (f_cost(c) < lowestf) {
-                current = c;
-
+                if (openSet.get(i).fCost() < node.fCost() || openSet.get(i).fCost() == node.fCost()){
+                    if(openSet.get(i).hCost < node.hCost){
+                        node = openSet.get(i);
+                    }
+                }
             }
 
-            open.remove(current);
+            Iterator<Node> iter = openSet.iterator();
+            while (iter.hasNext()){
+                if(iter.next().equals(node)){
+                   iter.remove();
+                }
+            }
+            closedSet.add(node);
 
-            closed.add(current);
 
-            if (current == coordinaat1) {
-                return null;
+            if (node.worldPosition.equals(targetNode.worldPosition)) {
+                targetNode.parent = node;
+                RetracePath(startNode,targetNode);
+               break;
             }
 
-            Coordinaat[] buren = new Coordinaat[4];
 
-            buren[0] = current.naar(Richting.NOORD);
-            buren[1] = current.naar(Richting.OOST);
-            buren[2] = current.naar(Richting.ZUID);
-            buren[3] = current.naar(Richting.WEST);
-
-            for (Coordinaat buur : buren) {
-                if (closed.contains(buur)) {
+            for (Node buur : getBuren(node)) {
+                if (!buur.walkable || closedSet.contains(buur)) {
                     continue;
                 }
-                if (!open.contains(buur)) {
-                    f_cost(buur);
 
-                    root.addKind(new Node(buur));
-                    if (!open.contains(buur)) {
-                        open.add(buur);
+                double newCostToBuur = node.gCost + node.worldPosition.afstandTot(buur.worldPosition);
+                if (newCostToBuur < buur.gCost || !openSet.contains(buur)) {
+                    buur.gCost = (int) newCostToBuur;
+                    buur.hCost = (int) buur.worldPosition.afstandTot(targetNode.worldPosition);
+                    buur.parent = node;
+
+                    if (!openSet.contains(buur)) {
+                        openSet.add(buur);
                     }
                 }
             }
         }
-
-        root.drukPreOrderAf();
         return null;
-
     }
 
-    public double f_cost(Coordinaat current) {
+    void RetracePath(Node startNode, Node endNode) {
+        ArrayList<Node> path = new ArrayList<>();
+        Node currentNode = endNode;
 
+        while (!currentNode.worldPosition.equals(startNode.worldPosition)) {
+            path.add(currentNode);
+            currentNode = currentNode.parent;
+        }
+        Collections.reverse(path);
 
-        g_cost = Math.sqrt(Math.pow(current.getX() - c1.getX(), 2) + Math.pow(current.getY() - c1.getY(), 2));
-        h_cost = Math.sqrt(Math.pow(current.getX() - c2.getX(), 2) + Math.pow(current.getY() - c2.getY(), 2));
-        f_cost = h_cost + g_cost;
-
-        return f_cost;
+        for (Node cord:path){
+            System.out.println(cord.worldPosition);
+        }
+        //System.out.println(path);
     }
 
-    public void addKind(Coordinaat pad) {
-        this.kinderen.add(pad);
+    public ArrayList<Node> getBuren(Node node){
+        ArrayList<Node> buren = new ArrayList<>();
 
+        buren.add(new Node(true,node.worldPosition.naar(Richting.NOORD).getX(),node.worldPosition.naar(Richting.NOORD).getY()));
+        buren.add(new Node(true,node.worldPosition.naar(Richting.OOST).getX(),node.worldPosition.naar(Richting.OOST).getY()));
+        buren.add(new Node(true,node.worldPosition.naar(Richting.ZUID).getX(),node.worldPosition.naar(Richting.ZUID).getY()));
+        buren.add(new Node(true,node.worldPosition.naar(Richting.WEST).getX(),node.worldPosition.naar(Richting.WEST).getY()));
 
+        return buren;
     }
 }
