@@ -1,34 +1,35 @@
 package io.gameoftrades.student44;
 
 import io.gameoftrades.model.algoritme.SnelstePadAlgoritme;
-import io.gameoftrades.model.kaart.Coordinaat;
-import io.gameoftrades.model.kaart.Kaart;
-import io.gameoftrades.model.kaart.Pad;
-import io.gameoftrades.model.kaart.Richting;
+import io.gameoftrades.model.kaart.*;
 
 import java.util.*;
 
 public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
 
-    Node startNode;
-    Node targetNode;
+    private Node startNode;
+    private Node targetNode;
+    private Pad route;
+    private Kaart kaart;
 
 
     @Override
-    public Pad bereken(Kaart kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
+    public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
 
-        this.startNode = new Node(true,coordinaat.getX(),coordinaat.getY());
-        this.targetNode = new Node(true,coordinaat1.getX(),coordinaat1.getY());
+        this.kaart=_kaart;
+        this.startNode = new Node(kaart.getTerreinOp(coordinaat),coordinaat.getX(),coordinaat.getY(),null,coordinaat1);
+        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),coordinaat1.getX(),coordinaat1.getY(),null,coordinaat1);
 
         ArrayList<Node> openSet = new ArrayList<>();
         HashSet<Node> closedSet = new HashSet<>();
         openSet.add(startNode);
 
+
         while (openSet.size()>0) {
             Node node = openSet.get(0);
             for (int i = 1; i < openSet.size(); i++) {
                 if (openSet.get(i).fCost() < node.fCost() || openSet.get(i).fCost() == node.fCost()){
-                    if(openSet.get(i).hCost < node.hCost){
+                    if(openSet.get(i).gethCost() < node.gethCost()){
                         node = openSet.get(i);
                     }
                 }
@@ -43,23 +44,25 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
             closedSet.add(node);
 
 
-            if (node.worldPosition.equals(targetNode.worldPosition)) {
-                targetNode.parent = node;
+            if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
+                targetNode.setParent(node);
                 RetracePath(startNode,targetNode);
                break;
             }
 
 
             for (Node buur : getBuren(node)) {
-                if (!buur.walkable || closedSet.contains(buur)) {
+                //System.out.println(buur.getWorldPosition());
+                //System.out.println(buur.getTerrein().getTerreinType());
+                if (!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)) {
                     continue;
                 }
 
-                double newCostToBuur = node.gCost + node.worldPosition.afstandTot(buur.worldPosition);
-                if (newCostToBuur < buur.gCost || !openSet.contains(buur)) {
-                    buur.gCost = (int) newCostToBuur;
-                    buur.hCost = (int) buur.worldPosition.afstandTot(targetNode.worldPosition);
-                    buur.parent = node;
+                double newCostToBuur = node.getgCost() + node.getWorldPosition().afstandTot(buur.getWorldPosition());
+                if (newCostToBuur < buur.getgCost() || !openSet.contains(buur)) {
+                    buur.setgCost((int)newCostToBuur);
+                    buur.sethCost((int) buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()));
+                    buur.setParent(node);
 
                     if (!openSet.contains(buur)) {
                         openSet.add(buur);
@@ -67,32 +70,54 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
                 }
             }
         }
-        return null;
+        return route;
+    }
+    public int getTijd(ArrayList<Node> nodes){
+        return nodes.size();
     }
 
-    void RetracePath(Node startNode, Node endNode) {
+
+    public Richting[] getRichtingen(ArrayList<Node> coordinaten){
+        ArrayList<Richting> richtingen = new ArrayList<>();
+        for(int i =0; i<coordinaten.size()-2;i++){
+            //System.out.println((coordinaten.get(i).getWorldPosition() + " " + coordinaten.get(i+1).getWorldPosition()));
+            richtingen.add(Richting.tussen(coordinaten.get(i).getWorldPosition(),coordinaten.get(i+1).getWorldPosition()));
+        }
+        Richting[] richtinglijst = richtingen.toArray(new Richting[richtingen.size()]);
+        //System.out.println(richtingen);
+        return richtinglijst;
+    }
+
+    public void RetracePath(Node startNode, Node endNode) {
         ArrayList<Node> path = new ArrayList<>();
         Node currentNode = endNode;
 
-        while (!currentNode.worldPosition.equals(startNode.worldPosition)) {
+        while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
             path.add(currentNode);
-            currentNode = currentNode.parent;
+            currentNode = currentNode.getParent();
         }
+        path.add(startNode);
         Collections.reverse(path);
 
-        for (Node cord:path){
-            System.out.println(cord.worldPosition);
-        }
-        //System.out.println(path);
+        route = new PadImpl(getRichtingen(path),getTijd(path));
     }
 
     public ArrayList<Node> getBuren(Node node){
         ArrayList<Node> buren = new ArrayList<>();
+        Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
+        System.out.println(node.getTerrein());
 
-        buren.add(new Node(true,node.worldPosition.naar(Richting.NOORD).getX(),node.worldPosition.naar(Richting.NOORD).getY()));
-        buren.add(new Node(true,node.worldPosition.naar(Richting.OOST).getX(),node.worldPosition.naar(Richting.OOST).getY()));
-        buren.add(new Node(true,node.worldPosition.naar(Richting.ZUID).getX(),node.worldPosition.naar(Richting.ZUID).getY()));
-        buren.add(new Node(true,node.worldPosition.naar(Richting.WEST).getX(),node.worldPosition.naar(Richting.WEST).getY()));
+
+        for(Richting richting:richtingen){
+            //System.out.println(richting);
+            //System.out.println(kaart.kijk(node.getTerrein(),richting));
+            buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node.getWorldPosition().naar(Richting.NOORD).getX(),node.getWorldPosition().naar(Richting.NOORD).getY(),node,targetNode.getWorldPosition()));
+        }
+        System.out.println("");
+        for(Node buur:buren){
+            //System.out.println(buur.getWorldPosition());
+            //System.out.println(buur.getTerrein());
+        }
 
         return buren;
     }
