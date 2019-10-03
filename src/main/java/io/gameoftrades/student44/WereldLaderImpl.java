@@ -19,7 +19,11 @@ public class WereldLaderImpl implements WereldLader {
     private String[] data;
     private int[] intData;
     private Kaart kaart;
-    private  ArrayList<Stad> steden;
+    private int xas;
+    private int yas;
+    private  ArrayList<Stad> steden = new ArrayList<>();
+    private ArrayList<Handel> handels = new ArrayList<>();
+    private int handelHoeveelheid;
     private Markt markt;
 
     public void laadOmvang(){
@@ -34,7 +38,6 @@ public class WereldLaderImpl implements WereldLader {
     }
 
     public void laadTerrein(){
-        lijn = scan.nextLine();
         for (int y = 0; y < intData[1]; y++) {
             for (int x = 0; x < intData[0]; x++) {
                 if(intData[0]== lijn.trim().length()) {
@@ -43,43 +46,42 @@ public class WereldLaderImpl implements WereldLader {
                     Coordinaat coordinaat = Coordinaat.op(x, y);
                     Terrein.op(kaart, coordinaat, terreinType);
                 }
-                else{
+                else
                     throw new IllegalArgumentException();
-                }
             }
             lijn = scan.nextLine();
         }
     }
 
     public void laadSteden(){
-        steden = new ArrayList<>();
         int stadHoeveelheid = Integer.parseInt(lijn.trim());
         lijn = scan.nextLine();
-        for (int x = 0; x < stadHoeveelheid; x++) {
+        for (int i = 0; i < stadHoeveelheid; i++) {
             lijn.trim();
             String[] stadData = lijn.split(",");
-            int xas = Integer.parseInt(stadData[0]);
-            int yas = Integer.parseInt(stadData[1]);
-            if((xas>intData[0]&&yas>intData[1])||(xas<=0&&yas<=0)){
+            if(coordinaatChecker(stadData)){
                 throw new IllegalArgumentException();
             }
-            else {
-                Coordinaat coordinaat = Coordinaat.op(xas, yas);
-                String stadNaam = stadData[2];
-                Stad stad = Stad.op(coordinaat, stadNaam);
-                steden.add(stad);
-            }
+            Coordinaat coordinaat = Coordinaat.op(xas, yas);
+            String stadNaam = stadData[2];
+            Stad stad = Stad.op(coordinaat, stadNaam);
+            steden.add(stad);
             lijn = scan.nextLine();
         }
     }
 
-    public void laadHandel(){
-        int handelHoeveelheid = Integer.parseInt(lijn.trim());
-        if(scan.hasNextLine()) {
-            lijn = scan.nextLine();
+    public boolean coordinaatChecker(String[] stadData){
+        xas = Integer.parseInt(stadData[0]);
+        yas = Integer.parseInt(stadData[1]);
+        if((xas>intData[0]&&yas>intData[1])||(xas<=0&&yas<=0)){
+            return true;
         }
-        ArrayList<Handel> handels = new ArrayList<>();
-        for (int x = 0; x < handelHoeveelheid; x++){
+        else
+            return false;
+    }
+
+    public void laadHandel(int handelHoeveelheid){
+        for (int i = 0; i < handelHoeveelheid; i++){
             for (Stad stad : steden) {
                 lijn.trim();
                 String[] marktData = lijn.split(",");
@@ -92,19 +94,27 @@ public class WereldLaderImpl implements WereldLader {
                     handels.add(handel);
                 }
             }
-            if(scan.hasNextLine()){
-                lijn = scan.nextLine();
-            }
+            lijnSkipper();
         }
-        markt = new Markt(handels);
     }
+
+    public void lijnSkipper(){
+        if(scan.hasNextLine()) {
+            lijn = scan.nextLine();
+        }
+    }
+
     @Override
     public Wereld laad(String resource) {
         this.resource = resource;
         laadOmvang();
+        lijn = scan.nextLine();
         laadTerrein();
         laadSteden();
-        laadHandel();
+        handelHoeveelheid = Integer.parseInt(lijn.trim());
+        lijnSkipper();
+        laadHandel(handelHoeveelheid);
+        markt = new Markt(handels);
         return  Wereld.van(kaart, steden, markt);
     }
 
