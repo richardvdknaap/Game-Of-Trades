@@ -23,6 +23,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         ArrayList<Node> openSet = new ArrayList<>();
         HashSet<Node> closedSet = new HashSet<>();
         openSet.add(startNode);
+        System.out.println(startNode.getTerrein());
 
 
         while (openSet.size()>0) {
