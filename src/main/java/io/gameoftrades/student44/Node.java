@@ -6,25 +6,19 @@ import io.gameoftrades.model.kaart.TerreinType;
 
 public class Node {
     private Coordinaat worldPosition;
-    private int gridX;
-    private int gridY;
 
-    private int gCost;
+    private int gCost = 1;
     private int hCost;
     private Node parent;
     private Terrein terrein;
 
-    public Node(Terrein _terrein, int _gridX, int _gridY, Node _parent, Coordinaat einde) {
+    public Node(Terrein _terrein, Node _parent, Coordinaat einde) {
         this.terrein = _terrein;
         this.parent = _parent;
-        this.gridX = _gridX;
-        this.gridY = _gridY;
         this.worldPosition = terrein.getCoordinaat();
 
         if(parent!=null){
             this.gCost = parent.getgCost() + terrein.getTerreinType().getBewegingspunten();
-            System.out.println(this.getWorldPosition());
-            System.out.println(this.gCost);
         }
 
         this.hCost =(int) worldPosition.afstandTot(einde);

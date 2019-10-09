@@ -24,8 +24,8 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
 
         this.kaart=_kaart;
-        this.startNode = new Node(kaart.getTerreinOp(coordinaat),coordinaat.getX(),coordinaat.getY(),null,coordinaat1);
-        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),coordinaat1.getX(),coordinaat1.getY(),null,coordinaat1);
+        this.startNode = new Node(kaart.getTerreinOp(coordinaat),null,coordinaat1);
+        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
 
         ArrayList<Node> openSet = new ArrayList<>();
         HashSet<Node> closedSet = new HashSet<>();
@@ -54,14 +54,11 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
                 targetNode.setParent(node);
                 RetracePath(startNode,targetNode);
-               break;
+                break;
             }
 
 
             for (Node buur : getBuren(node)) {
-                if (!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)) {
-                    continue;
-                }
 
                 double newCostToBuur = node.getgCost() + node.getWorldPosition().afstandTot(buur.getWorldPosition());
                 if (newCostToBuur < buur.getgCost() || !openSet.contains(buur)) {
@@ -112,7 +109,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         Collections.reverse(path);
 
         route = new PadImpl(getRichtingen(path),getTijd(path));
-        route = new PadImpl(getRichtingen(path),getTijd(path));
         if(debug){
             this.debugger.debugPad(kaart,startNode.getWorldPosition(),route);
         }
@@ -124,7 +120,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
 
         for(Richting richting:richtingen){
-            buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node.getWorldPosition().naar(Richting.NOORD).getX(),node.getWorldPosition().naar(Richting.NOORD).getY(),node,targetNode.getWorldPosition()));
+            buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition()));
         }
 
         return buren;
