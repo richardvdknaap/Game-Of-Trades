@@ -1,72 +1,53 @@
 package io.gameoftrades.student44;
 
+import io.gameoftrades.debug.Debuggable;
+import io.gameoftrades.debug.Debugger;
 import io.gameoftrades.model.algoritme.SnelstePadAlgoritme;
 import io.gameoftrades.model.kaart.*;
 
 import java.util.*;
 
-public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
+public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable {
 
     private Node startNode;
     private Node targetNode;
     private Pad route;
     private Kaart kaart;
+    private Debugger debugger;
+    public ArrayList<Node> openSet;
+    public HashSet<Node> closedSet;
 
+    @Override
+    public void setDebugger(Debugger debugger) {
+        this.debugger = debugger;
+    }
 
     @Override
     public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
 
         this.kaart=_kaart;
-        this.startNode = new Node(kaart.getTerreinOp(coordinaat),coordinaat.getX(),coordinaat.getY(),null,coordinaat1);
-        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),coordinaat1.getX(),coordinaat1.getY(),null,coordinaat1);
+        this.startNode = new Node(kaart.getTerreinOp(coordinaat),null,coordinaat1);
+        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
 
-        ArrayList<Node> openSet = new ArrayList<>();
-        HashSet<Node> closedSet = new HashSet<>();
+        this.openSet = new ArrayList<>();
+        this.closedSet = new HashSet<>();
         openSet.add(startNode);
 
 
         while (openSet.size()>0) {
-            Node node = openSet.get(0);
-            for (int i = 1; i < openSet.size(); i++) {
-                if (openSet.get(i).fCost() < node.fCost() || openSet.get(i).fCost() == node.fCost()){
-                    if(openSet.get(i).gethCost() < node.gethCost()){
-                        node = openSet.get(i);
-                    }
-                }
-            }
-
-            Iterator<Node> iter = openSet.iterator();
-            while (iter.hasNext()){
-                if(iter.next().equals(node)){
-                   iter.remove();
-                }
-            }
+            Node node = getLowest();
             closedSet.add(node);
+            System.out.println(openSet.size());
 
+            addBuren(node);
 
             if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
                 targetNode.setParent(node);
-                RetracePath(startNode,targetNode);
-               break;
+                RetracePath(startNode,targetNode,true);
+                break;
             }
 
 
-            for (Node buur : getBuren(node)) {
-                if (!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)) {
-                    continue;
-                }
-
-                double newCostToBuur = node.getgCost() + node.getWorldPosition().afstandTot(buur.getWorldPosition());
-                if (newCostToBuur < buur.getgCost() || !openSet.contains(buur)) {
-                    buur.setgCost((int)newCostToBuur);
-                    buur.sethCost((int) buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()));
-                    buur.setParent(node);
-
-                    if (!openSet.contains(buur)) {
-                        openSet.add(buur);
-                    }
-                }
-            }
         }
         return route;
     }
@@ -75,10 +56,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         for(Node node:nodes){
             //TODO Hier moeten de eerste en laatste node uitgehaald worden!!
             tijd += node.getTerrein().getTerreinType().getBewegingspunten();
-            System.out.println(node.getWorldPosition());
-            System.out.println(node.getgCost());
-            System.out.println(node.gethCost());
-            System.out.println(node.fCost());
         }
        return tijd;
     }
@@ -89,11 +66,15 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         for(int i =0; i<coordinaten.size()-2;i++){
             richtingen.add(Richting.tussen(coordinaten.get(i).getWorldPosition(),coordinaten.get(i+1).getWorldPosition()));
         }
-        Richting[] richtinglijst = richtingen.toArray(new Richting[richtingen.size()]);
+        Richting[] richtinglijst
+                = richtingen.toArray(new Richting[richtingen.size()]);
         return richtinglijst;
     }
 
-    public void RetracePath(Node startNode, Node endNode) {
+    public void RetracePath(Node startNode, Node endNode, boolean debug) {
+        if(this.debugger == null) {
+            debug = false;
+        }
         ArrayList<Node> path = new ArrayList<>();
         Node currentNode = endNode;
 
@@ -105,17 +86,42 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         Collections.reverse(path);
 
         route = new PadImpl(getRichtingen(path),getTijd(path));
+        if(debug){
+            this.debugger.debugPad(kaart,startNode.getWorldPosition(),route);
+        }
     }
 
-    public ArrayList<Node> getBuren(Node node){
-        ArrayList<Node> buren = new ArrayList<>();
+    public void addBuren(Node node){
         Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
 
-
         for(Richting richting:richtingen){
-            buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node.getWorldPosition().naar(Richting.NOORD).getX(),node.getWorldPosition().naar(Richting.NOORD).getY(),node,targetNode.getWorldPosition()));
+            final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
+            if(!this.openSet.contains(buur) && !this.closedSet.contains(buur)){
+                this.openSet.add(node);
+            }
+        }
+    }
+    private Node getLowest(){
+        if(openSet.isEmpty()){
+            return null;
+        }
+        Node lowest =null;
+        double cost = -1;
+        for(final Node node : this.openSet){
+            if (cost!=-1&&node.fCost()>=cost){
+                continue;
+            }
+            lowest = node;
+            cost = node.fCost();
         }
 
-        return buren;
+        Iterator<Node> iter = openSet.iterator();
+        while (iter.hasNext()){
+            if(iter.next().equals(lowest)){
+                iter.remove();
+            }
+        }
+
+        return lowest;
     }
 }

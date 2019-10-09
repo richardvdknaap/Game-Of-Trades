@@ -6,28 +6,22 @@ import io.gameoftrades.model.kaart.TerreinType;
 
 public class Node {
     private Coordinaat worldPosition;
-    private int gridX;
-    private int gridY;
 
-    private int gCost;
-    private int hCost;
+    private double gCost;
+    private double hCost;
     private Node parent;
     private Terrein terrein;
 
-    public Node(Terrein _terrein, int _gridX, int _gridY, Node _parent, Coordinaat einde) {
+    public Node(Terrein _terrein,  Node _parent, Coordinaat einde) {
         this.terrein = _terrein;
         this.parent = _parent;
-        this.gridX = _gridX;
-        this.gridY = _gridY;
         this.worldPosition = terrein.getCoordinaat();
 
         if(parent!=null){
             this.gCost = parent.getgCost() + terrein.getTerreinType().getBewegingspunten();
-            System.out.println(this.getWorldPosition());
-            System.out.println(this.gCost);
         }
 
-        this.hCost =(int) worldPosition.afstandTot(einde);
+        this.hCost = worldPosition.afstandTot(einde);
 
     }
 
@@ -43,15 +37,15 @@ public class Node {
         return terrein;
     }
 
-    public int getgCost(){
+    public double getgCost(){
         return gCost;
     }
 
-    public int gethCost(){
+    public double gethCost(){
         return hCost;
     }
 
-    public int fCost(){
+    public double fCost(){
         return gCost + hCost;
     }
 
@@ -59,11 +53,11 @@ public class Node {
         this.parent = _parent;
     }
 
-    public void setgCost(int _gCost){
+    public void setgCost(double _gCost){
         this.gCost = _gCost;
     }
 
-    public void sethCost(int _hCost){
+    public void sethCost(double _hCost){
         this.hCost = _hCost;
     }
 }
