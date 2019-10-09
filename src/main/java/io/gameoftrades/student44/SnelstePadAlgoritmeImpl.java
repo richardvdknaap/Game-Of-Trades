@@ -1,17 +1,24 @@
 package io.gameoftrades.student44;
 
+import io.gameoftrades.debug.Debuggable;
+import io.gameoftrades.debug.Debugger;
 import io.gameoftrades.model.algoritme.SnelstePadAlgoritme;
 import io.gameoftrades.model.kaart.*;
 
 import java.util.*;
 
-public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
+public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable {
 
     private Node startNode;
     private Node targetNode;
     private Pad route;
     private Kaart kaart;
+    private Debugger debugger;
 
+    @Override
+    public void setDebugger(Debugger debugger) {
+        this.debugger = debugger;
+    }
 
     @Override
     public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
@@ -96,7 +103,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
     public void RetracePath(Node startNode, Node endNode) {
         ArrayList<Node> path = new ArrayList<>();
         Node currentNode = endNode;
-
+        boolean debug= true;
         while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
             path.add(currentNode);
             currentNode = currentNode.getParent();
@@ -105,6 +112,10 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         Collections.reverse(path);
 
         route = new PadImpl(getRichtingen(path),getTijd(path));
+        route = new PadImpl(getRichtingen(path),getTijd(path));
+        if(debug){
+            this.debugger.debugPad(kaart,startNode.getWorldPosition(),route);
+        }
     }
 
     public ArrayList<Node> getBuren(Node node){
