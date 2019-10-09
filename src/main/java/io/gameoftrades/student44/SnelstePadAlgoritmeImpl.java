@@ -23,7 +23,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         ArrayList<Node> openSet = new ArrayList<>();
         HashSet<Node> closedSet = new HashSet<>();
         openSet.add(startNode);
-        System.out.println(startNode.getTerrein());
 
 
         while (openSet.size()>0) {
@@ -53,8 +52,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
 
 
             for (Node buur : getBuren(node)) {
-                //System.out.println(buur.getWorldPosition());
-                //System.out.println(buur.getTerrein().getTerreinType());
                 if (!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)) {
                     continue;
                 }
@@ -74,18 +71,25 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
         return route;
     }
     public int getTijd(ArrayList<Node> nodes){
-        return nodes.size();
+        int tijd = 0;
+        for(Node node:nodes){
+            //TODO Hier moeten de eerste en laatste node uitgehaald worden!!
+            tijd += node.getTerrein().getTerreinType().getBewegingspunten();
+            System.out.println(node.getWorldPosition());
+            System.out.println(node.getgCost());
+            System.out.println(node.gethCost());
+            System.out.println(node.fCost());
+        }
+       return tijd;
     }
 
 
     public Richting[] getRichtingen(ArrayList<Node> coordinaten){
         ArrayList<Richting> richtingen = new ArrayList<>();
         for(int i =0; i<coordinaten.size()-2;i++){
-            //System.out.println((coordinaten.get(i).getWorldPosition() + " " + coordinaten.get(i+1).getWorldPosition()));
             richtingen.add(Richting.tussen(coordinaten.get(i).getWorldPosition(),coordinaten.get(i+1).getWorldPosition()));
         }
         Richting[] richtinglijst = richtingen.toArray(new Richting[richtingen.size()]);
-        //System.out.println(richtingen);
         return richtinglijst;
     }
 
@@ -106,18 +110,10 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme {
     public ArrayList<Node> getBuren(Node node){
         ArrayList<Node> buren = new ArrayList<>();
         Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
-        System.out.println(node.getTerrein());
 
 
         for(Richting richting:richtingen){
-            //System.out.println(richting);
-            //System.out.println(kaart.kijk(node.getTerrein(),richting));
             buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node.getWorldPosition().naar(Richting.NOORD).getX(),node.getWorldPosition().naar(Richting.NOORD).getY(),node,targetNode.getWorldPosition()));
-        }
-        System.out.println("");
-        for(Node buur:buren){
-            //System.out.println(buur.getWorldPosition());
-            //System.out.println(buur.getTerrein());
         }
 
         return buren;

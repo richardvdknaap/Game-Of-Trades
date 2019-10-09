@@ -23,6 +23,8 @@ public class Node {
 
         if(parent!=null){
             this.gCost = parent.getgCost() + terrein.getTerreinType().getBewegingspunten();
+            System.out.println(this.getWorldPosition());
+            System.out.println(this.gCost);
         }
 
         this.hCost =(int) worldPosition.afstandTot(einde);

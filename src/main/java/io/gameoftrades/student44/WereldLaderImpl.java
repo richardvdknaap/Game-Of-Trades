@@ -64,7 +64,7 @@ public class WereldLaderImpl implements WereldLader {
                 throw new IllegalArgumentException();
             }
             else {
-                Coordinaat coordinaat = Coordinaat.op(xas, yas);
+                Coordinaat coordinaat = Coordinaat.op(xas-1, yas-1);
                 String stadNaam = stadData[2];
                 Stad stad = Stad.op(coordinaat, stadNaam);
                 steden.add(stad);
