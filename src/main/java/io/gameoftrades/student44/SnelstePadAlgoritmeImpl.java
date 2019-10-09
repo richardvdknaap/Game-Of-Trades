@@ -11,11 +11,14 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
     private Node startNode;
     private Node targetNode;
-    private Pad route;
+    private PadImpl route;
     private Kaart kaart;
     private Debugger debugger;
-    public ArrayList<Node> openSet;
-    public HashSet<Node> closedSet;
+    private int totalCost = 0;
+    private ArrayList<Node> openSet;
+    private ArrayList<Node> closedSet;
+    private ArrayList<Node> tiles;
+
 
     @Override
     public void setDebugger(Debugger debugger) {
@@ -30,83 +33,61 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
 
         this.openSet = new ArrayList<>();
-        this.closedSet = new HashSet<>();
+        this.closedSet = new ArrayList<>();
         openSet.add(startNode);
 
-
         while (openSet.size()>0) {
-            Node node = getLowest();
-            closedSet.add(node);
-            System.out.println(openSet.size());
-
-            addBuren(node);
-
-            if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
-                targetNode.setParent(node);
-                RetracePath(startNode,targetNode,true);
-                break;
-            }
-
-
+            Algoritme(true);
         }
         return route;
     }
-    public int getTijd(ArrayList<Node> nodes){
-        int tijd = 0;
-        for(Node node:nodes){
-            //TODO Hier moeten de eerste en laatste node uitgehaald worden!!
-            tijd += node.getTerrein().getTerreinType().getBewegingspunten();
-        }
-       return tijd;
-    }
 
+    public synchronized void Algoritme(boolean debug){
+        Node node = getLowest(true);
+        closedSet.add(node);
+        System.out.println(node.getWorldPosition());
 
-    public Richting[] getRichtingen(ArrayList<Node> coordinaten){
-        ArrayList<Richting> richtingen = new ArrayList<>();
-        for(int i =0; i<coordinaten.size()-2;i++){
-            richtingen.add(Richting.tussen(coordinaten.get(i).getWorldPosition(),coordinaten.get(i+1).getWorldPosition()));
-        }
-        Richting[] richtinglijst
-                = richtingen.toArray(new Richting[richtingen.size()]);
-        return richtinglijst;
-    }
-
-    public void RetracePath(Node startNode, Node endNode, boolean debug) {
-        if(this.debugger == null) {
-            debug = false;
-        }
-        ArrayList<Node> path = new ArrayList<>();
-        Node currentNode = endNode;
-
-        while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
-            path.add(currentNode);
-            currentNode = currentNode.getParent();
-        }
-        path.add(startNode);
-        Collections.reverse(path);
-
-        route = new PadImpl(getRichtingen(path),getTijd(path));
-        if(debug){
-            this.debugger.debugPad(kaart,startNode.getWorldPosition(),route);
-        }
-    }
-
-    public void addBuren(Node node){
         Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
 
         for(Richting richting:richtingen){
             final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
-            if(!this.openSet.contains(buur) && !this.closedSet.contains(buur)){
+            if(!openSet.contains(buur) && !closedSet.contains(buur)){
                 this.openSet.add(node);
             }
         }
+
+        if (!node.getWorldPosition().equals(targetNode.getWorldPosition())) {
+            return;
+        }
+
+        totalCost = (int) closedSet.get(closedSet.size() -1).getgCost();
+
+        tiles.add(node);
+
+        while(node.getParent()!=null){
+            final Node parent = node.getParent();
+            tiles.add(parent);
+            node = parent;
+        }
+
+        Richting[] richtings = new Richting[tiles.size()-1];
+
+        Collections.reverse(tiles);
+
+        for (int x=0; x<tiles.size()-1;x++){
+            richtings[x] = Richting.tussen(tiles.get(x).getWorldPosition(),tiles.get(x+1).getWorldPosition());
+        }
+        route = new PadImpl(richtings,totalCost);
     }
-    private Node getLowest(){
+
+
+    private Node getLowest(boolean opnemen){
         if(openSet.isEmpty()){
             return null;
         }
         Node lowest =null;
         double cost = -1;
+
         for(final Node node : this.openSet){
             if (cost!=-1&&node.fCost()>=cost){
                 continue;
@@ -115,12 +96,9 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             cost = node.fCost();
         }
 
-        Iterator<Node> iter = openSet.iterator();
-        while (iter.hasNext()){
-            if(iter.next().equals(lowest)){
-                iter.remove();
-            }
-        }
+       if(opnemen){
+           this.openSet.remove(lowest);
+       }
 
         return lowest;
     }
