@@ -2,62 +2,60 @@ package io.gameoftrades.student44;
 
 import io.gameoftrades.model.kaart.Coordinaat;
 import io.gameoftrades.model.kaart.Terrein;
-import io.gameoftrades.model.kaart.TerreinType;
 
 public class Node {
-    private Coordinaat worldPosition;
 
-    private int gCost = 1;
-    private int hCost;
+    private Terrein terrain;
     private Node parent;
-    private Terrein terrein;
+    private double gCost = 0;
+    private double hCost;
+    private Coordinaat worldposistion;
 
-    public Node(Terrein _terrein, Node _parent, Coordinaat einde) {
-        this.terrein = _terrein;
-        this.parent = _parent;
-        this.worldPosition = terrein.getCoordinaat();
+    public Node(Terrein terrain, Node parent, Coordinaat end) {
+        this.terrain = terrain;
+        this.parent = parent;
+        this.worldposistion = terrain.getCoordinaat();
+        if(parent != null)
+            this.gCost = parent.getgCost() + terrain.getTerreinType().getBewegingspunten();
 
-        if(parent!=null){
-            this.gCost = parent.getgCost() + (int)parent.getWorldPosition().afstandTot(this.getWorldPosition()) + terrein.getTerreinType().getBewegingspunten();
-        }
-
-        this.hCost =(int) worldPosition.afstandTot(einde);
-
+        this.hCost = worldposistion.afstandTot(end);
+    }
+    public Coordinaat getWorldPosition(){
+        return worldposistion;
     }
 
-    public Node getParent (){
+    public Node getParent() {
         return parent;
     }
 
-    public Coordinaat getWorldPosition(){
-        return worldPosition;
+    public Terrein getTerrein() {
+        return terrain;
     }
 
-    public Terrein getTerrein(){
-        return terrein;
+    public double getgCost() {
+        return this.gCost;
     }
 
-    public int getgCost(){
-        return gCost;
+    public double gethCost() {
+        return this.hCost;
     }
 
-    public int gethCost(){
-        return hCost;
+    public double fCost() {
+        return gethCost() + getgCost();
     }
 
-    public int fCost(){
-        return gCost + hCost;
+    @Override
+    public boolean equals(Object other) {
+        // Return if the other instance is the same
+        if(super.equals(other))
+            return true;
+
+        // Make sure the other object is a node instance
+        if(!(other instanceof Node))
+            return false;
+
+        // Compare the coordinates, return the result
+        return this.worldposistion.equals(((Node) other).getTerrein().getCoordinaat());
     }
 
-    public void setParent(Node _parent){
-        this.parent = _parent;
-    }
-
-    public void setgCost(int _gCost){
-        this.gCost = _gCost;
-    }
-
-    public void sethCost(int _hCost){
-        this.hCost = _hCost;
-    }
 }

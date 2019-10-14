@@ -14,6 +14,8 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     private Pad route;
     private Kaart kaart;
     private Debugger debugger;
+    private ArrayList<Node> openSet;
+    private ArrayList<Node> closedSet;
 
     @Override
     public void setDebugger(Debugger debugger) {
@@ -27,49 +29,54 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         this.startNode = new Node(kaart.getTerreinOp(coordinaat),null,coordinaat1);
         this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
 
-        ArrayList<Node> openSet = new ArrayList<>();
-        ArrayList<Node> closedSet = new ArrayList<>();
+        this.openSet = new ArrayList<>();
+        this.closedSet = new ArrayList<>();
         openSet.add(startNode);
 
 
         while (openSet.size()>0) {
-            Node node = openSet.get(0);
-            for (int i = 1; i < openSet.size(); i++) {
-                if (openSet.get(i).fCost() < node.fCost() || openSet.get(i).fCost() == node.fCost()){
-                    if(openSet.get(i).gethCost() < node.gethCost()){
-                        node = openSet.get(i);
-                    }
-                }
-            }
 
-            Iterator<Node> iter = openSet.iterator();
-            while (iter.hasNext()){
-                if(iter.next().equals(node)){
-                   iter.remove();
-                }
-            }
+            Node node = getLaag();
             closedSet.add(node);
 
-
-            if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
-                targetNode.setParent(node);
-                RetracePath(startNode,targetNode);
-                break;
-            }
-
+            System.out.println(node);
             Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
             for(Richting richting : richtingen){
-                final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
-
+                final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,coordinaat1);
                 if(!openSet.contains(buur)&&!closedSet.contains(buur)){
                     openSet.add(buur);
-                    System.out.println(openSet.size());
+                    System.out.println(buur.getWorldPosition());
                 }
+            }
+
+            if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
+                RetracePath(startNode,targetNode);
+                break;
             }
 
         }
         return route;
     }
+
+    public Node getLaag(){
+        System.out.println(openSet.size());
+        if(openSet.isEmpty()){
+            System.out.println("return null");
+            return null;
+        }
+        Node laagste = null;
+        double cost = -1;
+        for(final Node node : this.openSet){
+            if(cost!=1&&node.fCost()>=cost){
+                continue;
+            }
+            laagste = node;
+            cost = node.fCost();
+        }
+        this.openSet.remove(laagste);
+        return laagste;
+    }
+
     public int getTijd(ArrayList<Node> nodes){
         int tijd = 0;
         for(Node node:nodes){
