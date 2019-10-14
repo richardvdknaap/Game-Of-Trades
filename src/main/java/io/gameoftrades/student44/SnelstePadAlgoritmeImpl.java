@@ -28,7 +28,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
 
         ArrayList<Node> openSet = new ArrayList<>();
-        HashSet<Node> closedSet = new HashSet<>();
+        ArrayList<Node> closedSet = new ArrayList<>();
         openSet.add(startNode);
 
 
@@ -58,10 +58,14 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             }
 
 
-            for (Node buur : getBuren(node)) {
 
-                double newCostToBuur = node.getgCost() + node.getWorldPosition().afstandTot(buur.getWorldPosition());
-                if (newCostToBuur < buur.getgCost() || !openSet.contains(buur)) {
+            for (Node buur : getBuren(node,closedSet,openSet)) {
+                double newCostToBuur = buur.getWorldPosition().afstandTot(startNode.getWorldPosition()) + buur.getTerrein().getTerreinType().getBewegingspunten();
+                if(!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)){
+                    continue;
+                }
+
+                if (node.getWorldPosition().afstandTot(targetNode.getWorldPosition()) < buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()) || !openSet.contains(buur)) {
                     buur.setgCost((int)newCostToBuur);
                     buur.sethCost((int) buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()));
                     buur.setParent(node);
@@ -79,10 +83,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         for(Node node:nodes){
             //TODO Hier moeten de eerste en laatste node uitgehaald worden!!
             tijd += node.getTerrein().getTerreinType().getBewegingspunten();
-            System.out.println(node.getWorldPosition());
-            System.out.println(node.getgCost());
-            System.out.println(node.gethCost());
-            System.out.println(node.fCost());
         }
        return tijd;
     }
@@ -114,13 +114,20 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         }
     }
 
-    public ArrayList<Node> getBuren(Node node){
+    public ArrayList<Node> getBuren(Node node, ArrayList<Node> closed, ArrayList<Node> open){
         ArrayList<Node> buren = new ArrayList<>();
         Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
 
+        System.out.println(closed.size());
 
         for(Richting richting:richtingen){
-            buren.add(new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition()));
+            final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
+
+            if(!open.contains(buur) && !closed.contains(buur)) {
+                buren.add(new Node(kaart.kijk(node.getTerrein(), richting), node, targetNode.getWorldPosition()));
+            }
+
+
         }
 
         return buren;

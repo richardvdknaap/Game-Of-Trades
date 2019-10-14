@@ -18,7 +18,7 @@ public class Node {
         this.worldPosition = terrein.getCoordinaat();
 
         if(parent!=null){
-            this.gCost = parent.getgCost() + terrein.getTerreinType().getBewegingspunten();
+            this.gCost = parent.getgCost() + (int)parent.getWorldPosition().afstandTot(this.getWorldPosition()) + terrein.getTerreinType().getBewegingspunten();
         }
 
         this.hCost =(int) worldPosition.afstandTot(einde);
