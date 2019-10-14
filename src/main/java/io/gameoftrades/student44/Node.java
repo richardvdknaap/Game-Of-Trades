@@ -5,59 +5,110 @@ import io.gameoftrades.model.kaart.Terrein;
 import io.gameoftrades.model.kaart.TerreinType;
 
 public class Node {
-    private Coordinaat worldPosition;
 
-    private int gCost = 1;
-    private int hCost;
+    /**
+     * Terrain tile.
+     */
+    private Terrein terrain;
+
+    /**
+     * Parent node.
+     */
     private Node parent;
-    private Terrein terrein;
 
-    public Node(Terrein _terrein, Node _parent, Coordinaat einde) {
-        this.terrein = _terrein;
-        this.parent = _parent;
-        this.worldPosition = terrein.getCoordinaat();
+    /**
+     * G cost value.
+     */
+    private double gCost = 0;
 
-        if(parent!=null){
-            this.gCost = parent.getgCost() + (int)parent.getWorldPosition().afstandTot(this.getWorldPosition()) + terrein.getTerreinType().getBewegingspunten();
-        }
+    /**
+     * H cost value.
+     */
+    private double hCost;
 
-        this.hCost =(int) worldPosition.afstandTot(einde);
+    /**
+     * Node coordinate.
+     */
+    private Coordinaat coordinaat;
 
+    /**
+     * Constructor.
+     *
+     * @param terrain Terrain.
+     * @param parent  Parent node.
+     */
+    public Node(Terrein terrain, Node parent, Coordinaat end) {
+        // Set the properties
+        this.terrain = terrain;
+        this.parent = parent;
+
+        // Get the coordinate
+        this.coordinaat = terrain.getCoordinaat();
+
+        // Calculate the g cost
+        if(parent != null)
+            this.gCost = parent.getgCost() + terrain.getTerreinType().getBewegingspunten();
+
+        // Calculate the h cost
+        this.hCost = coordinaat.afstandTot(end);
     }
 
-    public Node getParent (){
+    /**
+     * Get the parent node if there is any.
+     *
+     * @return Parent node or null.
+     */
+    public Node getParent() {
         return parent;
     }
 
-    public Coordinaat getWorldPosition(){
-        return worldPosition;
+    /**
+     * Get the terrain type.
+     *
+     * @return Terrain.
+     */
+    public Terrein getTerrain() {
+        return terrain;
     }
 
-    public Terrein getTerrein(){
-        return terrein;
+    /**
+     * Get the g cost.
+     *
+     * @return G cost value.
+     */
+    public double getgCost() {
+        return this.gCost;
     }
 
-    public int getgCost(){
-        return gCost;
+    /**
+     * Get the h cost.
+     *
+     * @return H cost value.
+     */
+    public double gethCost() {
+        return this.hCost;
     }
 
-    public int gethCost(){
-        return hCost;
+    /**
+     * Get the f cost.
+     *
+     * @return F cost value.
+     */
+    public double getfCost() {
+        return gethCost() + getgCost();
     }
 
-    public int fCost(){
-        return gCost + hCost;
-    }
+    @Override
+    public boolean equals(Object other) {
+        // Return if the other instance is the same
+        if(super.equals(other))
+            return true;
 
-    public void setParent(Node _parent){
-        this.parent = _parent;
-    }
+        // Make sure the other object is a node instance
+        if(!(other instanceof Node))
+            return false;
 
-    public void setgCost(int _gCost){
-        this.gCost = _gCost;
-    }
-
-    public void sethCost(int _hCost){
-        this.hCost = _hCost;
+        // Compare the coordinates, return the result
+        return this.coordinaat.equals(((Node) other).getTerrain().getCoordinaat());
     }
 }
