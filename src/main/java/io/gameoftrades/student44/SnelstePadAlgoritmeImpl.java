@@ -57,24 +57,16 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
                 break;
             }
 
+            Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
+            for(Richting richting : richtingen){
+                final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
 
-
-            for (Node buur : getBuren(node,closedSet,openSet)) {
-                double newCostToBuur = buur.getWorldPosition().afstandTot(startNode.getWorldPosition()) + buur.getTerrein().getTerreinType().getBewegingspunten();
-                if(!buur.getTerrein().getTerreinType().isToegankelijk() || closedSet.contains(buur)){
-                    continue;
-                }
-
-                if (node.getWorldPosition().afstandTot(targetNode.getWorldPosition()) < buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()) || !openSet.contains(buur)) {
-                    buur.setgCost((int)newCostToBuur);
-                    buur.sethCost((int) buur.getWorldPosition().afstandTot(targetNode.getWorldPosition()));
-                    buur.setParent(node);
-
-                    if (!openSet.contains(buur)) {
-                        openSet.add(buur);
-                    }
+                if(!openSet.contains(buur)&&!closedSet.contains(buur)){
+                    openSet.add(buur);
+                    System.out.println(openSet.size());
                 }
             }
+
         }
         return route;
     }
@@ -112,24 +104,5 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         if(debug){
             this.debugger.debugPad(kaart,startNode.getWorldPosition(),route);
         }
-    }
-
-    public ArrayList<Node> getBuren(Node node, ArrayList<Node> closed, ArrayList<Node> open){
-        ArrayList<Node> buren = new ArrayList<>();
-        Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
-
-        System.out.println(closed.size());
-
-        for(Richting richting:richtingen){
-            final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,targetNode.getWorldPosition());
-
-            if(!open.contains(buur) && !closed.contains(buur)) {
-                buren.add(new Node(kaart.kijk(node.getTerrein(), richting), node, targetNode.getWorldPosition()));
-            }
-
-
-        }
-
-        return buren;
     }
 }
