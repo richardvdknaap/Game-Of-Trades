@@ -67,11 +67,13 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         Node laagste = null;
         double cost = -1;
         for(final Node node : this.openSet){
+            System.out.println(cost!=1&&node.fCost()>=cost);
             if(cost!=1&&node.fCost()>=cost){
                 continue;
             }
             laagste = node;
             cost = node.fCost();
+            System.out.println(cost);
         }
         this.openSet.remove(laagste);
         return laagste;
