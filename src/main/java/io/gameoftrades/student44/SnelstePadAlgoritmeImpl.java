@@ -39,13 +39,12 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             Node node = getLaag();
             closedSet.add(node);
 
-            System.out.println(node);
             Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
             for(Richting richting : richtingen){
                 final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,coordinaat1);
                 if(!openSet.contains(buur)&&!closedSet.contains(buur)){
                     openSet.add(buur);
-                    System.out.println(buur.getWorldPosition());
+                    buur.setParent(node);
                 }
             }
 
@@ -59,21 +58,17 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     }
 
     public Node getLaag(){
-        System.out.println(openSet.size());
         if(openSet.isEmpty()){
-            System.out.println("return null");
             return null;
         }
         Node laagste = null;
         double cost = -1;
         for(final Node node : this.openSet){
-            System.out.println(cost!=1&&node.fCost()>=cost);
-            if(cost!=1&&node.fCost()>=cost){
+            if(cost!=-1&&node.fCost()>=cost){
                 continue;
             }
             laagste = node;
             cost = node.fCost();
-            System.out.println(cost);
         }
         this.openSet.remove(laagste);
         return laagste;
@@ -104,6 +99,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         boolean debug= true;
         while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
             path.add(currentNode);
+            System.out.println(currentNode.getParent());
             currentNode = currentNode.getParent();
         }
         path.add(startNode);

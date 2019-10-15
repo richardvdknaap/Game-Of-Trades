@@ -44,6 +44,10 @@ public class Node {
         return gethCost() + getgCost();
     }
 
+    public void setParent(Node node){
+        this.parent = node;
+    }
+
     @Override
     public boolean equals(Object other) {
         // Return if the other instance is the same
