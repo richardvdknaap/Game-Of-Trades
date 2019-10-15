@@ -62,10 +62,12 @@ public class WereldLaderImpl implements WereldLader {
             if(coordinaatChecker(stadData)){
                 throw new IllegalArgumentException();
             }
-            Coordinaat coordinaat = Coordinaat.op(xas, yas);
-            String stadNaam = stadData[2];
-            Stad stad = Stad.op(coordinaat, stadNaam);
-            steden.add(stad);
+            else {
+                Coordinaat coordinaat = Coordinaat.op(xas-1, yas-1);
+                String stadNaam = stadData[2];
+                Stad stad = Stad.op(coordinaat, stadNaam);
+                steden.add(stad);
+            }
             lijn = scan.nextLine();
         }
     }
