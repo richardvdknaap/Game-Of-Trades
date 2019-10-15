@@ -49,6 +49,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             }
 
             if (node.getWorldPosition().equals(targetNode.getWorldPosition())) {
+                targetNode.setParent(node);
                 RetracePath(startNode,targetNode);
                 break;
             }
@@ -76,10 +77,10 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
     public int getTijd(ArrayList<Node> nodes){
         int tijd = 0;
-        for(Node node:nodes){
-            //TODO Hier moeten de eerste en laatste node uitgehaald worden!!
-            tijd += node.getTerrein().getTerreinType().getBewegingspunten();
+        for(int x=1;x<nodes.size()-1;x++){
+            tijd += nodes.get(x).getTerrein().getTerreinType().getBewegingspunten();
         }
+
        return tijd;
     }
 
