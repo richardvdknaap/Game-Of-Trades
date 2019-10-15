@@ -11,7 +11,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
     private Node startNode;
     private Node targetNode;
-    private Pad route;
+    private PadImpl route;
     private Kaart kaart;
     private Debugger debugger;
     private ArrayList<Node> openSet;
@@ -21,6 +21,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     public void setDebugger(Debugger debugger) {
         this.debugger = debugger;
     }
+
 
     @Override
     public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
@@ -32,7 +33,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         this.openSet = new ArrayList<>();
         this.closedSet = new ArrayList<>();
         openSet.add(startNode);
-
 
         while (openSet.size()>0) {
 
@@ -53,8 +53,8 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
                 RetracePath(startNode,targetNode);
                 break;
             }
-
         }
+
         return route;
     }
 
@@ -83,7 +83,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
        return tijd;
     }
-
 
     public Richting[] getRichtingen(ArrayList<Node> coordinaten){
         ArrayList<Richting> richtingen = new ArrayList<>();

@@ -53,7 +53,6 @@ public class Node {
         // Return if the other instance is the same
         if(super.equals(other))
             return true;
-
         // Make sure the other object is a node instance
         if(!(other instanceof Node))
             return false;
