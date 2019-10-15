@@ -22,10 +22,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         this.debugger = debugger;
     }
 
-    @Override
-    public void setDebugger(Debugger debugger) {
-        this.debugger = debugger;
-    }
 
     @Override
     public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
@@ -58,8 +54,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
                 break;
             }
         }
-      
-        }
+
         return route;
     }
 
@@ -88,8 +83,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
        return tijd;
     }
-
-        Richting[] richtings = new Richting[tiles.size()-1];
 
     public Richting[] getRichtingen(ArrayList<Node> coordinaten){
         ArrayList<Richting> richtingen = new ArrayList<>();
