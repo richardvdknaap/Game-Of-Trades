@@ -45,7 +45,7 @@ public class Node {
     }
 
     public void setParent(Node node){
-        this.parent = node;
+        parent = node;
     }
 
     @Override
