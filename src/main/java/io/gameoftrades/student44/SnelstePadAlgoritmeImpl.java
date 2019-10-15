@@ -43,8 +43,8 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
             for(Richting richting : richtingen){
                 final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,coordinaat1);
                 if(!openSet.contains(buur)&&!closedSet.contains(buur)){
-                    openSet.add(buur);
                     buur.setParent(node);
+                    openSet.add(buur);
                 }
             }
 
@@ -99,7 +99,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
         boolean debug= true;
         while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
             path.add(currentNode);
-            System.out.println(currentNode.getParent());
             currentNode = currentNode.getParent();
         }
         path.add(startNode);
