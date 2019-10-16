@@ -16,6 +16,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     private Debugger debugger;
     private ArrayList<Node> openSet;
     private ArrayList<Node> closedSet;
+    private boolean debug = false;
 
     @Override
     public void setDebugger(Debugger debugger) {
@@ -96,7 +97,6 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
     public void RetracePath(Node startNode, Node endNode) {
         ArrayList<Node> path = new ArrayList<>();
         Node currentNode = endNode;
-        boolean debug= true;
         while (!currentNode.getWorldPosition().equals(startNode.getWorldPosition())) {
             path.add(currentNode);
             currentNode = currentNode.getParent();
