@@ -4,7 +4,11 @@ import io.gameoftrades.model.Handelaar;
 import io.gameoftrades.model.algoritme.HandelsplanAlgoritme;
 import io.gameoftrades.model.algoritme.SnelstePadAlgoritme;
 import io.gameoftrades.model.algoritme.StedenTourAlgoritme;
+import io.gameoftrades.model.kaart.Kaart;
+import io.gameoftrades.model.kaart.Stad;
 import io.gameoftrades.model.lader.WereldLader;
+
+import java.util.List;
 
 /**
  * Welkom bij Game of Trades! 
@@ -32,7 +36,6 @@ public class HandelaarImpl implements Handelaar {
      */
     @Override
     public SnelstePadAlgoritme nieuwSnelstePadAlgoritme() {
-        // TODO Auto-generated method stub
         return new SnelstePadAlgoritmeImpl();
     }
 
@@ -42,7 +45,7 @@ public class HandelaarImpl implements Handelaar {
     @Override
     public StedenTourAlgoritme nieuwStedenTourAlgoritme() {
         // TODO Auto-generated method stub
-        return null;
+        return new StedenTourAlgoritmeImpl();
     }
 
     /**
