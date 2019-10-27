@@ -50,14 +50,11 @@ public class Node {
 
     @Override
     public boolean equals(Object other) {
-        // Return if the other instance is the same
         if(super.equals(other))
             return true;
-        // Make sure the other object is a node instance
         if(!(other instanceof Node))
             return false;
 
-        // Compare the coordinates, return the result
         return this.worldposistion.equals(((Node) other).getTerrein().getCoordinaat());
     }
 

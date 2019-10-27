@@ -24,11 +24,11 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
 
     @Override
-    public Pad bereken(Kaart _kaart, Coordinaat coordinaat, Coordinaat coordinaat1) {
+    public Pad bereken(Kaart _kaart, Coordinaat startCoordinaat, Coordinaat eindCoordinaar) {
 
         this.kaart=_kaart;
-        this.startNode = new Node(kaart.getTerreinOp(coordinaat),null,coordinaat1);
-        this.targetNode = new Node(kaart.getTerreinOp(coordinaat1),null,coordinaat1);
+        this.startNode = new Node(kaart.getTerreinOp(startCoordinaat),null,eindCoordinaar);
+        this.targetNode = new Node(kaart.getTerreinOp(eindCoordinaar),null,eindCoordinaar);
 
         this.openSet = new ArrayList<>();
         this.closedSet = new ArrayList<>();
@@ -41,7 +41,7 @@ public class SnelstePadAlgoritmeImpl implements SnelstePadAlgoritme, Debuggable 
 
             Richting[] richtingen = node.getTerrein().getMogelijkeRichtingen();
             for(Richting richting : richtingen){
-                final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,coordinaat1);
+                final Node buur = new Node(kaart.kijk(node.getTerrein(),richting),node,eindCoordinaar);
                 if(!openSet.contains(buur)&&!closedSet.contains(buur)){
                     buur.setParent(node);
                     openSet.add(buur);
