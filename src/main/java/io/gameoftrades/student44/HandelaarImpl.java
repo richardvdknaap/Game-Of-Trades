@@ -32,7 +32,6 @@ public class HandelaarImpl implements Handelaar {
      */
     @Override
     public SnelstePadAlgoritme nieuwSnelstePadAlgoritme() {
-        // TODO Auto-generated method stub
         return new SnelstePadAlgoritmeImpl();
     }
 
@@ -41,7 +40,6 @@ public class HandelaarImpl implements Handelaar {
      */
     @Override
     public StedenTourAlgoritme nieuwStedenTourAlgoritme() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -50,7 +48,6 @@ public class HandelaarImpl implements Handelaar {
      */
     @Override
     public HandelsplanAlgoritme nieuwHandelsplanAlgoritme() {
-        // TODO Auto-generated method stub
         return null;
     }
 }
