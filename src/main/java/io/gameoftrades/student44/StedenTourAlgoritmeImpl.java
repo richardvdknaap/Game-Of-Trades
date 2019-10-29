@@ -10,10 +10,7 @@ import io.gameoftrades.model.kaart.Kaart;
 import io.gameoftrades.model.kaart.Pad;
 import io.gameoftrades.model.kaart.Stad;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
@@ -24,9 +21,9 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     private int totalSteden;
     private int popSize;
     private ArrayList<Integer> order;
-    private int[] population;
-    private ArrayList<Double> fitness;
-    private int recordDistance;
+    private ArrayList<ArrayList<Integer>> population;
+    private ArrayList<Integer> fitness;
+    private int recordDistance = Integer.MAX_VALUE;
     private ArrayList<Integer> bestEver;
     private ArrayList<Stad> bestRoute;
     private Stad currentBest;
@@ -47,29 +44,23 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
         this.order = new ArrayList<>();
         this.bestEver = new ArrayList<>();
         this.bestRoute = new ArrayList<>();
+        this.population = new ArrayList<>();
+        this.fitness = new ArrayList<>();
         setUp();
-        for(int a:bestEver){
-            System.out.print(a + " ");
-        }
-        System.out.println(recordDistance);
 
-        for(int x=0;x<200;x++) {
+        for(int x=0;x<500;x++) {
             int d = calcDistance(steden, order);
             if (d < recordDistance) {
                 recordDistance = d;
                 bestEver = order;
             }
+
             nextOrder();
         }
         for (int k = 0; k < bestEver.size(); k++) {
             int n = bestEver.get(k);
             bestRoute.add(steden.get(n));
         }
-        System.out.println(" ");
-        for(int a:bestEver){
-            System.out.print(a + " ");
-        }
-        System.out.println(recordDistance);
         debugger.debugSteden(kaart, bestRoute);
         return bestRoute;
 
@@ -82,9 +73,31 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             order.add(i);
         }
 
-        int d = calcDistance(steden,order);
-        recordDistance = d;
-        bestEver = order;
+        for(int i=0; i<100;i++){
+            ArrayList<Integer> newOrder = new ArrayList<>(shuffle(order,100));
+            population.add(newOrder);
+        }
+        for(int i=0; i<population.size();i++){
+            int d = calcDistance(steden,population.get(i));
+            if(d<recordDistance){
+                recordDistance = d;
+                bestEver = population.get(i);
+                System.out.println(recordDistance);
+                System.out.println(bestEver);
+            }
+            fitness.add(d);
+        }
+    }
+
+    public ArrayList<Integer> shuffle(ArrayList<Integer> a, int n){
+        ArrayList<Integer> newarray = new ArrayList<>();
+        for(int i = 0; i<n; i++){
+            int indexA = new Random().nextInt(a.size());
+            int indexB = new Random().nextInt(a.size());
+            newarray = swapOrder(a,indexA,indexB);
+        }
+        //System.out.println(newarray);
+        return newarray;
     }
 
     public ArrayList<Integer> swapOrder(ArrayList<Integer> a, int i, int j){
@@ -134,6 +147,15 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
         order.addAll(head);
         order.addAll(tail);
 
+    }
+
+    public float factorial(int n){
+        if(n==1){
+            return 1;
+        }
+        else{
+            return n * factorial(n-1);
+        }
     }
 
 
