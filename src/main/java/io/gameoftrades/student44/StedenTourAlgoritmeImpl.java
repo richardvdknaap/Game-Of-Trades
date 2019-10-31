@@ -12,6 +12,7 @@ import io.gameoftrades.model.kaart.Stad;
 
 import java.util.*;
 
+import static jdk.nashorn.internal.objects.NativeMath.floor;
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
 public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable {
@@ -22,13 +23,14 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     private int popSize;
     private ArrayList<Integer> order;
     private ArrayList<ArrayList<Integer>> population;
-    private ArrayList<Integer> fitness;
+    private ArrayList<Double> fitness;
     private int recordDistance = Integer.MAX_VALUE;
     private ArrayList<Integer> bestEver;
     private ArrayList<Stad> bestRoute;
     private Stad currentBest;
     private Handelaar handelaar;
     private SnelstePadAlgoritme algoritme;
+    private ArrayList<ArrayList<Integer>> newPopulation;
 
 
     @Override
@@ -47,6 +49,10 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
         this.population = new ArrayList<>();
         this.fitness = new ArrayList<>();
         setUp();
+
+
+        normalizeFitness();
+        nextGeneration();
 
         for(int x=0;x<500;x++) {
             int d = calcDistance(steden, order);
@@ -73,21 +79,78 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             order.add(i);
         }
 
-        for(int i=0; i<100;i++){
+        for(int i=0; i<120;i++){
             ArrayList<Integer> newOrder = new ArrayList<>(shuffle(order,100));
             population.add(newOrder);
         }
-        for(int i=0; i<population.size();i++){
-            int d = calcDistance(steden,population.get(i));
-            if(d<recordDistance){
-                recordDistance = d;
-                bestEver = population.get(i);
-                System.out.println(recordDistance);
-                System.out.println(bestEver);
-            }
-            fitness.add(d);
+    }
+
+
+    public void normalizeFitness(){
+        int sum = 0;
+        for(int i = 0; i <fitness.size(); i++){
+            System.out.println(fitness.get(i));
+            sum += fitness.get(i);
+        }
+        for(int i = 0; i <fitness.size(); i++){
+            fitness.add(fitness.get(i) / sum);
         }
     }
+
+    public void nextGeneration(){
+        newPopulation = new ArrayList<>();
+        for (int i = 0; i < population.size(); i++) {
+            ArrayList<Integer> orderA = pickOne(population, fitness);
+            ArrayList<Integer> orderB = pickOne(population, fitness);
+            ArrayList<Integer> order = crossOver(orderA, orderB);
+            mutate(order, 0.1);
+            newPopulation.add(order);
+        }
+        population = newPopulation;
+    }
+
+    /**
+     * Ik weet niet zeker of ik die goed heb geimplementeerd. De meeste getallen
+     * die er uit komen zijn nu tussen de 0.14 en 0.16...
+     * Ik heb het nu wel werkend gekregen... maar ik weet niet precies of het de
+     * juiste implementatie geeft. Ik zie het wel bij filmpje 5.
+     * @param list
+     * @param prob
+     * @return
+     */
+    public ArrayList<Integer> pickOne(ArrayList<ArrayList<Integer>> list, ArrayList<Double> prob){
+        int index = 0;
+        prob.add(1.0);
+        double r = random(1);
+
+        while(r > 0){
+            r = r - prob.get(index);
+            index ++;
+        }
+        index--;
+        return list.get(index);
+    }
+
+    public void crossOver (ArrayList<Integer> orderA, ArrayList<Integer> orderB){
+        int start = new Random().nextInt(orderA.size());
+        
+
+    }
+
+
+    public void mutate(ArrayList<Integer> order, double mutationRate){
+        for (int i = 0; i < totalSteden; i++) {
+            if(random(1) < mutationRate){
+                int indexA = new Random().nextInt(order.size());
+                int indexB = new Random().nextInt(order.size());
+                swapOrder(order, indexA, indexB);
+            }
+        }
+
+    }
+
+
+
 
     public ArrayList<Integer> shuffle(ArrayList<Integer> a, int n){
         ArrayList<Integer> newarray = new ArrayList<>();
