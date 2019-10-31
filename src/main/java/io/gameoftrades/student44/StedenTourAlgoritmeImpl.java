@@ -10,8 +10,10 @@ import io.gameoftrades.model.kaart.Kaart;
 import io.gameoftrades.model.kaart.Pad;
 import io.gameoftrades.model.kaart.Stad;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
+import static java.lang.Math.pow;
 import static jdk.nashorn.internal.objects.NativeMath.floor;
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
@@ -27,7 +29,8 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     private int recordDistance = Integer.MAX_VALUE;
     private ArrayList<Integer> bestEver;
     private ArrayList<Stad> bestRoute;
-    private Stad currentBest;
+    private ArrayList<Stad> debuggsteden;
+    private ArrayList<Integer> currentBest;
     private Handelaar handelaar;
     private SnelstePadAlgoritme algoritme;
     private ArrayList<ArrayList<Integer>> newPopulation;
@@ -38,30 +41,30 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
         this.kaart = _kaart;
         this.steden = _list;
         this.totalSteden = steden.size();
-        this.popSize = 500;
-        this.currentBest = steden.get(0);
+        this.popSize = 9000;
         this.handelaar = new HandelaarImpl();
         this.algoritme = handelaar.nieuwSnelstePadAlgoritme();
 
         this.order = new ArrayList<>();
         this.bestEver = new ArrayList<>();
         this.bestRoute = new ArrayList<>();
+        this.debuggsteden = new ArrayList<>();
         this.population = new ArrayList<>();
         this.fitness = new ArrayList<>();
+
         setUp();
 
-
-        normalizeFitness();
-        nextGeneration();
-
-        for(int x=0;x<500;x++) {
-            int d = calcDistance(steden, order);
-            if (d < recordDistance) {
-                recordDistance = d;
-                bestEver = order;
+        for(int x=0;x<20;x++) {
+            System.out.println("x = " + x);
+            calculateFitness();
+            normalizeFitness();
+            nextGeneration();
+            debuggsteden.clear();
+            for (int k = 0; k < bestEver.size(); k++) {
+                int n = bestEver.get(k);
+                debuggsteden.add(steden.get(n));
             }
-
-            nextOrder();
+            debugger.debugSteden(kaart, debuggsteden);
         }
         for (int k = 0; k < bestEver.size(); k++) {
             int n = bestEver.get(k);
@@ -79,21 +82,38 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             order.add(i);
         }
 
-        for(int i=0; i<120;i++){
+        for(int i=0; i<popSize;i++){
             ArrayList<Integer> newOrder = new ArrayList<>(shuffle(order,100));
             population.add(newOrder);
         }
     }
+    public void calculateFitness() {
+        int currentRecord = Integer.MAX_VALUE;
+        for (int i = 0; i < population.size(); i++) {
+            int d = calcDistance(steden, population.get(i));
+            if (d < recordDistance) {
+                recordDistance = d;
+                System.out.println(recordDistance);
+                bestEver = population.get(i);
+            }
+            if (d < currentRecord) {
+                currentRecord = d;
+                currentBest = population.get(i);
+            }
 
+            double math = 1 / (pow(d, 8) + 1);
+            fitness.add(math);
+
+        }
+    }
 
     public void normalizeFitness(){
-        int sum = 0;
+        float sum = 0;
         for(int i = 0; i <fitness.size(); i++){
-            System.out.println(fitness.get(i));
             sum += fitness.get(i);
         }
         for(int i = 0; i <fitness.size(); i++){
-            fitness.add(fitness.get(i) / sum);
+            fitness.set(i,fitness.get(i)/sum);
         }
     }
 
@@ -103,7 +123,7 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             ArrayList<Integer> orderA = pickOne(population, fitness);
             ArrayList<Integer> orderB = pickOne(population, fitness);
             ArrayList<Integer> order = crossOver(orderA, orderB);
-            mutate(order, 0.1);
+            mutate(order);
             newPopulation.add(order);
         }
         population = newPopulation;
@@ -114,42 +134,37 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
      * die er uit komen zijn nu tussen de 0.14 en 0.16...
      * Ik heb het nu wel werkend gekregen... maar ik weet niet precies of het de
      * juiste implementatie geeft. Ik zie het wel bij filmpje 5.
-     * @param list
-     * @param prob
-     * @return
      */
-    public ArrayList<Integer> pickOne(ArrayList<ArrayList<Integer>> list, ArrayList<Double> prob){
+    public ArrayList<Integer> pickOne(ArrayList<ArrayList<Integer>> poplist, ArrayList<Double> fitnessprob){
         int index = 0;
-        prob.add(1.0);
-        double r = random(1);
-
+        double r =random(1);
         while(r > 0){
-            r = r - prob.get(index);
+            r = r - fitnessprob.get(index);
             index ++;
         }
         index--;
-        return list.get(index);
+        return poplist.get(index);
     }
 
-    public void crossOver (ArrayList<Integer> orderA, ArrayList<Integer> orderB){
+    public ArrayList<Integer> crossOver (ArrayList<Integer> orderA, ArrayList<Integer> orderB){
         int start = new Random().nextInt(orderA.size());
-        
-
-    }
-
-
-    public void mutate(ArrayList<Integer> order, double mutationRate){
-        for (int i = 0; i < totalSteden; i++) {
-            if(random(1) < mutationRate){
-                int indexA = new Random().nextInt(order.size());
-                int indexB = new Random().nextInt(order.size());
-                swapOrder(order, indexA, indexB);
+        int end = new Random().nextInt((orderA.size()+1)-start) + start;
+        ArrayList<Integer> neworder = new ArrayList<>(order.subList(start, end));
+        for(int i=0;i<orderB.size();i++){
+            int city = orderB.get(i);
+            if(!neworder.contains(city)){
+                neworder.add(city);
             }
         }
-
+        return neworder;
     }
 
 
+    public void mutate(ArrayList<Integer> order){
+        int indexA = new Random().nextInt(order.size());
+        int indexB = new Random().nextInt(order.size());
+        swapOrder(order, indexA, indexB);
+    }
 
 
     public ArrayList<Integer> shuffle(ArrayList<Integer> a, int n){
@@ -159,7 +174,6 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             int indexB = new Random().nextInt(a.size());
             newarray = swapOrder(a,indexA,indexB);
         }
-        //System.out.println(newarray);
         return newarray;
     }
 
@@ -182,43 +196,6 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             sum += d;
         }
         return sum;
-    }
-
-    public void nextOrder(){
-        int largestI = -1;
-        for(int i = 0; i<order.size() -1 ; i++){
-            if(order.get(i)<order.get(i+1)){
-                largestI = i;
-            }
-        }
-        if(largestI ==-1){
-            return;
-        }
-        int largestJ = -1;
-        for(int j = 0; j<order.size(); j++){
-            if(order.get(largestI)<order.get(j)){
-                largestJ = j;
-            }
-        }
-        //order = swapOrder(order,largestI,largestJ);
-        order = swapOrder(order,largestI,largestJ);
-
-        ArrayList<Integer> tail = new ArrayList<>(order.subList(largestI+1, order.size()));
-        ArrayList<Integer> head = new ArrayList<>(order.subList(0, largestI+1));
-        Collections.reverse(tail);
-        order.clear();
-        order.addAll(head);
-        order.addAll(tail);
-
-    }
-
-    public float factorial(int n){
-        if(n==1){
-            return 1;
-        }
-        else{
-            return n * factorial(n-1);
-        }
     }
 
 
