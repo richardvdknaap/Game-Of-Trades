@@ -34,14 +34,16 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     private Handelaar handelaar;
     private SnelstePadAlgoritme algoritme;
     private ArrayList<ArrayList<Integer>> newPopulation;
+    private int stapsize;
 
 
     @Override
     public List<Stad> bereken(Kaart _kaart, List<Stad> _list) {
         this.kaart = _kaart;
         this.steden = _list;
+        this.stapsize = 10;
         this.totalSteden = steden.size();
-        this.popSize = 9000;
+        this.popSize = 2000;
         this.handelaar = new HandelaarImpl();
         this.algoritme = handelaar.nieuwSnelstePadAlgoritme();
 
@@ -54,8 +56,8 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
 
         setUp();
 
-        for(int x=0;x<20;x++) {
-            System.out.println("x = " + x);
+        for(int x=0;x<stapsize;x++) {
+            System.out.println("Stap " + x + " van de " + stapsize);
             calculateFitness();
             normalizeFitness();
             nextGeneration();
@@ -93,7 +95,7 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             int d = calcDistance(steden, population.get(i));
             if (d < recordDistance) {
                 recordDistance = d;
-                System.out.println(recordDistance);
+                System.out.println("Kortste afstand tot nu toe: " + recordDistance);
                 bestEver = population.get(i);
             }
             if (d < currentRecord) {
