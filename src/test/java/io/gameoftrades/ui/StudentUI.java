@@ -13,7 +13,7 @@ public class StudentUI {
 		MainGui.builder()
 		       .add(new HandelaarImpl())
 		       // Je kan hier eventueel extra algoritmen toevoegen dmv extra 'add' aanroepen.
-		       .toon(TileSet.T32, "/kaarten/westeros-kaart.txt");
+		       .toon(TileSet.T16, "/kaarten/westeros-kaart.txt");
 		       //.toon(TileSet.T32, "/kaarten/voorbeeld-kaart.txt");
 	}
 	

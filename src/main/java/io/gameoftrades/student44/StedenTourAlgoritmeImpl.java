@@ -41,9 +41,9 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     public List<Stad> bereken(Kaart _kaart, List<Stad> _list) {
         this.kaart = _kaart;
         this.steden = _list;
-        this.stapsize = 10;
+        this.stapsize = 30;
         this.totalSteden = steden.size();
-        this.popSize = 2000;
+        this.popSize = 550;
         this.handelaar = new HandelaarImpl();
         this.algoritme = handelaar.nieuwSnelstePadAlgoritme();
 
@@ -72,6 +72,7 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
             int n = bestEver.get(k);
             bestRoute.add(steden.get(n));
         }
+
         debugger.debugSteden(kaart, bestRoute);
         return bestRoute;
 
@@ -85,7 +86,7 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
         }
 
         for(int i=0; i<popSize;i++){
-            ArrayList<Integer> newOrder = new ArrayList<>(shuffle(order,100));
+            ArrayList<Integer> newOrder = order;
             population.add(newOrder);
         }
     }
@@ -169,15 +170,15 @@ public class StedenTourAlgoritmeImpl implements StedenTourAlgoritme, Debuggable 
     }
 
 
-    public ArrayList<Integer> shuffle(ArrayList<Integer> a, int n){
-        ArrayList<Integer> newarray = new ArrayList<>();
-        for(int i = 0; i<n; i++){
-            int indexA = new Random().nextInt(a.size());
-            int indexB = new Random().nextInt(a.size());
-            newarray = swapOrder(a,indexA,indexB);
-        }
-        return newarray;
-    }
+//    public ArrayList<Integer> shuffle(ArrayList<Integer> a, int n){
+//        ArrayList<Integer> newarray = new ArrayList<>();
+//        for(int i = 0; i<n; i++){
+//            int indexA = new Random().nextInt(a.size());
+//            int indexB = new Random().nextInt(a.size());
+//            newarray = swapOrder(a,indexA,indexB);
+//        }
+//        return newarray;
+//    }
 
     public ArrayList<Integer> swapOrder(ArrayList<Integer> a, int i, int j){
         int temp = a.get(i);
