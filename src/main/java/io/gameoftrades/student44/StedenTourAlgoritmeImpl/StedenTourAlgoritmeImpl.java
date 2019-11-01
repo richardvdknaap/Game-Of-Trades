@@ -1,4 +1,4 @@
-package io.gameoftrades.student44;
+package io.gameoftrades.student44.StedenTourAlgoritmeImpl;
 
 import io.gameoftrades.debug.Debuggable;
 import io.gameoftrades.debug.Debugger;
@@ -9,6 +9,7 @@ import io.gameoftrades.model.kaart.Coordinaat;
 import io.gameoftrades.model.kaart.Kaart;
 import io.gameoftrades.model.kaart.Pad;
 import io.gameoftrades.model.kaart.Stad;
+import io.gameoftrades.student44.HandelaarImpl;
 
 import java.sql.SQLOutput;
 import java.util.*;

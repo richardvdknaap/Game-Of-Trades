@@ -1,4 +1,4 @@
-package io.gameoftrades.student44;
+package io.gameoftrades.student44.WereldLader;
 
 import io.gameoftrades.model.Wereld;
 import io.gameoftrades.model.kaart.*;

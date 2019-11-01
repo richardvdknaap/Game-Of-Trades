@@ -4,11 +4,10 @@ import io.gameoftrades.model.Handelaar;
 import io.gameoftrades.model.algoritme.HandelsplanAlgoritme;
 import io.gameoftrades.model.algoritme.SnelstePadAlgoritme;
 import io.gameoftrades.model.algoritme.StedenTourAlgoritme;
-import io.gameoftrades.model.kaart.Kaart;
-import io.gameoftrades.model.kaart.Stad;
 import io.gameoftrades.model.lader.WereldLader;
-
-import java.util.List;
+import io.gameoftrades.student44.SnelstePadAlgoritme.SnelstePadAlgoritmeImpl;
+import io.gameoftrades.student44.StedenTourAlgoritmeImpl.StedenTourAlgoritmeImpl;
+import io.gameoftrades.student44.WereldLader.WereldLaderImpl;
 
 /**
  * Welkom bij Game of Trades! 

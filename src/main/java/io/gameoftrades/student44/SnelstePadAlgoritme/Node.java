@@ -1,4 +1,4 @@
-package io.gameoftrades.student44;
+package io.gameoftrades.student44.SnelstePadAlgoritme;
 
 import io.gameoftrades.model.kaart.Coordinaat;
 import io.gameoftrades.model.kaart.Terrein;
