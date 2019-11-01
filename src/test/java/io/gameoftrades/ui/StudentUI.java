@@ -12,7 +12,7 @@ public class StudentUI {
 	public static void main(String[] args) {
 		MainGui.builder()
 		       .add(new HandelaarImpl())
-		       .toon(TileSet.T32, "/kaarten/westeros-kaart.txt");
+		       .toon(TileSet.T32,"/kaarten/testcases/eiland-kaart.txt");
 
 	}
 	

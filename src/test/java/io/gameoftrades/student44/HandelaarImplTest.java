@@ -113,4 +113,65 @@ public class HandelaarImplTest {
         }
     }
 
+    @Test
+    public void RouteMetAndereMap(){
+        Wereld wereld = handelaar.nieuweWereldLader().laad("/kaarten/testcases/ander-map.txt");
+
+        Kaart kaart = wereld.getKaart();
+        Stad van = wereld.getSteden().get(0);
+        Stad naar = wereld.getSteden().get(1);
+
+        SnelstePadAlgoritme algoritme = handelaar.nieuwSnelstePadAlgoritme();
+        assertNotNull(algoritme);
+
+        Pad pad = algoritme.bereken(kaart, van.getCoordinaat(), naar.getCoordinaat());
+
+        assertNotNull(pad.getBewegingen());
+
+        // 19 is de tijd voor de meest optimale route, om de bergen heen.
+
+        assertEquals(161, pad.getTotaleTijd());
+
+        // Heen
+
+        Coordinaat bestemming = pad.volg(van.getCoordinaat());
+        assertEquals(naar.getCoordinaat(), bestemming);
+
+        // En Terug
+
+        Coordinaat bron = pad.omgekeerd().volg(naar.getCoordinaat());
+        assertEquals(van.getCoordinaat(), bron);
+
+    }
+    @Test
+    public void NietDoorWaterLopen(){
+        Wereld wereld = handelaar.nieuweWereldLader().laad("/kaarten/testcases/eiland-kaart.txt");
+
+        Kaart kaart = wereld.getKaart();
+        Stad van = wereld.getSteden().get(0);
+        Stad naar = wereld.getSteden().get(1);
+
+        SnelstePadAlgoritme algoritme = handelaar.nieuwSnelstePadAlgoritme();
+        assertNotNull(algoritme);
+
+        Pad pad = algoritme.bereken(kaart, van.getCoordinaat(), naar.getCoordinaat());
+
+        assertNotNull(pad.getBewegingen());
+
+        // 19 is de tijd voor de meest optimale route, om de bergen heen.
+
+        assertEquals(161, pad.getTotaleTijd());
+
+        // Heen
+
+        Coordinaat bestemming = pad.volg(van.getCoordinaat());
+        assertEquals(naar.getCoordinaat(), bestemming);
+
+        // En Terug
+
+        Coordinaat bron = pad.omgekeerd().volg(naar.getCoordinaat());
+        assertEquals(van.getCoordinaat(), bron);
+
+    }
+
 }
